@@ -1,0 +1,220 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Полина Бунтовская — фотограф в Москве. Персональные, свадебные, семейные и AI-фотосессии.">
+  <title>НЕСЛУЧАЙНЫЙ КАДР — Полина Бунтовская</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/sections.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cursor.css">
+</head>
+<body>
+
+  <header class="header" id="header">
+    <div class="header__inner">
+      <a href="#" class="header__logo" id="header-logo">Полина Бунтовская · фотограф</a>
+      <nav class="nav" id="nav">
+        <a href="#portfolio">Портфолио</a>
+        <a href="#directions">Направления</a>
+        <a href="#about">Обо мне</a>
+        <a href="#reviews">Отзывы</a>
+        <a href="#faq">FAQ</a>
+        <a href="#contact">Контакты</a>
+      </nav>
+      <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="hero">
+      <div class="hero__content">
+        <div class="hero__composition">
+          <h1 class="hero__project" id="hero-project">НЕСЛУЧАЙНЫЙ КАДР</h1>
+          <p class="hero__slogan" id="hero-slogan">Истории, созданные с вниманием к вам</p>
+        </div>
+        <div class="hero__meta" id="hero-meta"></div>
+        <a href="#contact" class="btn">Записаться <span class="btn-arrow">→</span></a>
+      </div>
+      <div class="hero__portrait">
+        <div class="hero__portrait-deco"></div>
+        <div class="hero__portrait-wrap">
+          <img id="hero-portrait" src="images/hero.png" alt="Полина Бунтовская">
+        </div>
+      </div>
+    </section>
+
+    <section class="positioning" id="positioning">
+      <div class="container reveal">
+        <p class="section-label">Философия</p>
+        <h2 class="section-title" id="positioning-title"></h2>
+        <p class="section-text" id="positioning-text"></p>
+      </div>
+    </section>
+
+    <section class="portfolio" id="portfolio">
+      <div class="container">
+        <p class="section-label reveal">Работы</p>
+        <h2 class="section-title reveal">Портфолио</h2>
+        <div class="portfolio-filters reveal" id="portfolio-filters"></div>
+        <div class="portfolio-grid" id="portfolio-grid"></div>
+      </div>
+    </section>
+
+    <section class="directions" id="directions">
+      <div class="container">
+        <p class="section-label reveal">Услуги</p>
+        <h2 class="section-title reveal">Направления съёмок</h2>
+        <div class="directions-grid" id="directions-grid"></div>
+      </div>
+    </section>
+
+    <section class="ai-block" id="ai">
+      <div class="container">
+        <p class="section-label reveal">Новое направление</p>
+        <h2 class="section-title reveal" id="ai-title"></h2>
+        <p class="section-text reveal" id="ai-subtitle"></p>
+        <p class="section-text reveal" id="ai-text" style="margin-top:1rem"></p>
+        <div class="ai-block__grid" id="ai-grid"></div>
+        <p class="demo-badge reveal" id="ai-note" style="margin-top:2rem"></p>
+      </div>
+    </section>
+
+    <section class="about" id="about">
+      <div class="container about-grid">
+        <div class="about-photo reveal">
+          <img id="about-photo" src="images/about.png" alt="Полина Бунтовская">
+        </div>
+        <div class="reveal">
+          <p class="section-label">Знакомство</p>
+          <h2 class="section-title" id="about-title"></h2>
+          <p class="section-text" id="about-text"></p>
+          <ul class="about-highlights" id="about-highlights"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="posing" id="posing">
+      <div class="container posing-inner reveal">
+        <p class="section-label">Поддержка</p>
+        <h2 class="section-title" id="posing-title"></h2>
+        <p class="section-text" id="posing-text"></p>
+        <p class="posing-quote" id="posing-quote"></p>
+      </div>
+    </section>
+
+    <section class="benefits" id="benefits">
+      <div class="container">
+        <p class="section-label reveal">Почему я</p>
+        <h2 class="section-title reveal">Преимущества</h2>
+        <div class="benefits-grid" id="benefits-grid"></div>
+      </div>
+    </section>
+
+    <section class="reviews" id="reviews">
+      <div class="container">
+        <p class="section-label reveal">Отзывы</p>
+        <h2 class="section-title reveal">Что говорят клиенты</h2>
+        <div class="reviews-carousel reveal">
+          <div class="reviews-track" id="reviews-track"></div>
+          <div class="reviews-nav">
+            <button id="review-prev" aria-label="Предыдущий">←</button>
+            <button id="review-next" aria-label="Следующий">→</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq" id="faq">
+      <div class="container">
+        <p class="section-label reveal">Вопросы</p>
+        <h2 class="section-title reveal">Частые вопросы</h2>
+        <div class="faq-list reveal" id="faq-list"></div>
+      </div>
+    </section>
+
+    <section class="cta" id="cta">
+      <div class="container reveal">
+        <h2 class="section-title" id="cta-title"></h2>
+        <p class="section-text" id="cta-text"></p>
+        <a href="#contact" class="btn">Написать мне <span class="btn-arrow">→</span></a>
+      </div>
+    </section>
+
+    <section class="contact-section" id="contact">
+      <div class="container">
+        <p class="section-label reveal">Связь</p>
+        <h2 class="section-title reveal">Записаться на съёмку</h2>
+        <div class="form-wrapper reveal">
+          <p class="form-note" id="form-note"></p>
+          <form id="contact-form" novalidate>
+            <div class="form-field">
+              <label for="name">Имя *</label>
+              <input type="text" id="name" name="name" data-required>
+              <span class="form-error"></span>
+            </div>
+            <div class="form-field">
+              <label>Способ связи *</label>
+              <div class="radio-group">
+                <label><input type="radio" name="contact-method" value="telegram"> Telegram</label>
+                <label><input type="radio" name="contact-method" value="phone"> Телефон</label>
+              </div>
+              <span class="form-error" id="method-error"></span>
+            </div>
+            <div class="form-field">
+              <label for="contact">Контакт *</label>
+              <input type="text" id="contact" name="contact" data-required placeholder="@username или +7...">
+              <span class="form-error"></span>
+            </div>
+            <div class="form-field">
+              <label for="form-direction">Направление *</label>
+              <select id="form-direction" name="direction" data-required></select>
+              <span class="form-error"></span>
+            </div>
+            <div class="form-field">
+              <label for="message">Сообщение</label>
+              <textarea id="message" name="message" rows="4" placeholder="Расскажите о вашей идее..."></textarea>
+            </div>
+            <button type="submit" class="btn">Отправить <span class="btn-arrow">→</span></button>
+            <div class="form-success" id="form-success" hidden></div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <div>
+        <p class="footer__brand" id="footer-brand"></p>
+        <p style="font-size:0.85rem;color:rgba(232,226,218,0.6);margin-top:0.5rem">Москва · фотограф</p>
+      </div>
+      <div class="footer__links">
+        <p style="font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem;opacity:0.5">Контакты</p>
+        <a href="#" id="footer-telegram"></a>
+        <a href="#" id="footer-phone"></a>
+        <a href="#" id="footer-email"></a>
+      </div>
+      <div class="footer__links">
+        <p style="font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem;opacity:0.5">Документы</p>
+        <a href="privacy.html">Политика конфиденциальности</a>
+        <a href="consent.html">Согласие на обработку данных</a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span id="footer-copy"></span>
+      <span>НЕСЛУЧАЙНЫЙ КАДР</span>
+    </div>
+  </footer>
+
+  <script src="data/content.js"></script>
+  <script src="data/portfolio.js"></script>
+  <script src="data/reviews.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

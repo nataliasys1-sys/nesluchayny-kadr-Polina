@@ -1,0 +1,19 @@
+:root {
+  --color-bg: #f5f0ea;
+  --color-bg-dark: #141210;
+  --color-bg-card: #faf7f3;
+  --color-text: #1e1a17;
+  --color-text-muted: #6b635a;
+  --color-text-light: #e8e2da;
+  --color-accent: #a67c6d;
+  --color-accent-hover: #8f6556;
+  --color-border: rgba(30, 26, 23, 0.1);
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-brand: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Jost", "Segoe UI", sans-serif;
+  --header-height: 72px;
+  --container: min(1120px, 92vw);
+  --radius: 4px;
+  --shadow: 0 20px 60px rgba(20, 18, 16, 0.08);
+  --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}

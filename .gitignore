@@ -1,0 +1,30 @@
+﻿# OS junk
+Thumbs.db
+.DS_Store
+
+# Documents and old saved pages
+*.docx
+*.htm
+
+# Root duplicate images (not in images/)
+/about.png
+/hero.png
+/portfolio-*.jpg
+/portfolio-*.png
+
+# Root IMG_* duplicates
+/IMG_*
+
+# Project tooling and skills
+SKILL*.md
+serve.ps1
+site-build/
+site-restore/
+
+# Old export folder
+Сайт для фотографа_files/
+
+# Secrets
+.env
+*.token
+*credentials*
