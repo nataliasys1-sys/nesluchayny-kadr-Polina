@@ -1,5 +1,10 @@
 const SITE_CONTENT = {
   projectName: "НЕСЛУЧАЙНЫЙ КАДР",
+  heroTitleLines: {
+    ne: "НЕ",
+    line2: "случайный",
+    line3: "кадр",
+  },
   slogan: "Истории, созданные с вниманием к вам",
   photographer: "Полина Бунтовская",
   role: "фотограф",

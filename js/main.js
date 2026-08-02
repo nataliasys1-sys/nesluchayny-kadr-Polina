@@ -15,7 +15,12 @@ function renderSite() {
   document.title = c.projectName + " — " + c.photographer;
 
   setText("header-logo", c.photographer + " · " + c.role);
-  setText("hero-project", c.projectName);
+  const t = c.heroTitleLines || { ne: "НЕ", line2: "случайный", line3: "кадр" };
+  setHtml("hero-project", `
+    <span class="hero__title-line hero__title-ne">${t.ne}</span>
+    <span class="hero__title-line hero__title-word">${t.line2}</span>
+    <span class="hero__title-line hero__title-word">${t.line3}</span>
+  `);
   setText("hero-slogan", c.slogan);
   setHtml("hero-meta", `<span>${c.city}</span><span>Опыт ${c.experience}</span>`);
   document.getElementById("hero-portrait").src = c.heroPortrait;
