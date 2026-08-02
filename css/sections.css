@@ -54,9 +54,10 @@
 }
 .hero__slogan {
   font-family: var(--font-display);
-  font-size: clamp(0.875rem, 1.4vw, 1rem);
+  font-size: clamp(1.125rem, 2.2vw, 1.5rem);
   font-style: normal;
-  color: var(--color-accent);
+  font-weight: 400;
+  color: var(--color-text-muted);
   margin-top: 0.65rem;
   max-width: none;
   white-space: nowrap;
@@ -106,6 +107,7 @@
 .filter-btn.active { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
 .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
 .ai-block__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+.ai-block__grid:has(.ai-block__item:only-child) { grid-template-columns: 1fr; max-width: 360px; margin-left: auto; margin-right: auto; }
 .portfolio-item,
 .ai-block__item {
   position: relative;
