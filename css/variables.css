@@ -13,6 +13,8 @@
   --font-body: "Jost", "Segoe UI", sans-serif;
   --header-height: 72px;
   --container: min(1120px, 92vw);
+  --container-wide: min(1220px, 94vw);
+  --section-pad: 5rem;
   --radius: 4px;
   --shadow: 0 20px 60px rgba(20, 18, 16, 0.08);
   --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);

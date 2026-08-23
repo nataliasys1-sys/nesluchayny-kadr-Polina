@@ -214,6 +214,9 @@ function initPortfolio() {
   }
 
   function bindFeaturedInteractions() {
+    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    let hoverTimer = null;
+
     grid.querySelectorAll("[data-filter-target]").forEach(card => {
       const category = card.dataset.filterTarget;
 
@@ -225,6 +228,14 @@ function initPortfolio() {
           applyFilter(category, { fromFeatured: true });
         }
       });
+
+      if (canHover) {
+        card.addEventListener("mouseenter", () => {
+          clearTimeout(hoverTimer);
+          hoverTimer = setTimeout(() => applyFilter(category), 320);
+        });
+        card.addEventListener("mouseleave", () => clearTimeout(hoverTimer));
+      }
     });
   }
 
