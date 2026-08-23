@@ -60,12 +60,13 @@ function renderAiBlock() {
   setText("ai-subtitle", b.subtitle);
   setText("ai-text", b.text);
   setText("ai-note", b.note);
-  document.getElementById("ai-grid").innerHTML = b.images.map(img => `
-    <div class="ai-block__item reveal">
-      <img src="${img.src}" alt="${img.alt}" loading="lazy">
-      <span class="mark-badge">AI-концепт</span>
-    </div>
-  `).join("");
+  const images = typeof AI_GALLERY !== "undefined" ? AI_GALLERY : b.images.map(img => ({
+    image: img.src,
+    alt: img.alt,
+  }));
+  document.getElementById("ai-grid").innerHTML = `
+    <div class="ai-block__gallery reveal">${renderAiGalleryMarkup(images)}</div>
+  `;
 }
 
 function renderAbout() {
@@ -131,6 +132,57 @@ function initHeader() {
   nav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => nav.classList.remove("open")));
 }
 
+function renderAiGalleryMarkup(images) {
+  return `<div class="portfolio-ai-grid">${images.map(img => `
+    <div class="portfolio-ai-grid__cell">
+      <img src="${img.image || img.src}" alt="${img.alt}" loading="lazy">
+      <span class="mark-badge">AI-концепт</span>
+    </div>
+  `).join("")}</div>`;
+}
+
+function renderPortfolioItem(item) {
+  if (item.isAi) {
+    return `<article class="portfolio-item portfolio-item--ai reveal" data-category="ai">
+      <div class="portfolio-item__cover">
+        <img class="portfolio-item__img" src="${item.image}" alt="${item.title}" loading="lazy">
+        <span class="portfolio-item__title">${item.title}</span>
+        <span class="mark-badge">AI-концепт</span>
+      </div>
+      <div class="portfolio-item__ai-gallery" aria-hidden="true">
+        ${renderAiGalleryMarkup(AI_GALLERY)}
+      </div>
+    </article>`;
+  }
+
+  return `<article class="portfolio-item reveal" data-category="${item.category}">
+    <img class="portfolio-item__img" src="${item.image}" alt="${item.title}" loading="lazy">
+    <span class="portfolio-item__title">${item.title}</span>
+  </article>`;
+}
+
+function bindAiPortfolioItem(aiItem) {
+  if (!aiItem || aiItem.dataset.aiBound === "true") return;
+  aiItem.dataset.aiBound = "true";
+
+  const isCoarse = window.matchMedia("(pointer: coarse)").matches;
+  const close = () => aiItem.classList.remove("is-expanded");
+
+  if (isCoarse) {
+    aiItem.addEventListener("click", e => {
+      e.stopPropagation();
+      aiItem.classList.toggle("is-expanded");
+    });
+    document.addEventListener("click", e => {
+      if (!aiItem.contains(e.target)) close();
+    });
+  }
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") close();
+  });
+}
+
 function initPortfolio() {
   const grid = document.getElementById("portfolio-grid");
   const filtersEl = document.getElementById("portfolio-filters");
@@ -141,26 +193,38 @@ function initPortfolio() {
     ).join("");
   }
 
-  grid.innerHTML = PORTFOLIO_ITEMS.map(item => {
-    const mark = item.mark === "ai" ? '<span class="mark-badge">AI-концепт</span>'
-      : item.mark === "visual" ? '<span class="mark-badge">Визуальный пример</span>' : "";
-    return `<article class="portfolio-item reveal" data-category="${item.category}">
-      <img class="portfolio-item__img" src="${item.image}" alt="${item.title}" loading="lazy">
-      <span class="portfolio-item__title">${item.title}</span>${mark}
-    </article>`;
-  }).join("");
+  function renderFeaturedVitrine() {
+    grid.className = "portfolio-grid portfolio-grid--featured";
+    grid.innerHTML = PORTFOLIO_FEATURED.map(renderPortfolioItem).join("");
+    bindAiPortfolioItem(grid.querySelector(".portfolio-item--ai"));
+  }
+
+  function renderCategoryView(category) {
+    if (category === "ai") {
+      grid.className = "portfolio-grid portfolio-grid--ai-gallery";
+      grid.innerHTML = `<div class="portfolio-ai-panel reveal">${renderAiGalleryMarkup(AI_GALLERY)}</div>`;
+      return;
+    }
+
+    const item = PORTFOLIO_FEATURED.find(entry => entry.category === category);
+    grid.className = "portfolio-grid portfolio-grid--single";
+    grid.innerHTML = item ? renderPortfolioItem({ ...item, isAi: false }) : "";
+  }
+
+  function applyFilter(filter) {
+    if (filter === "all") renderFeaturedVitrine();
+    else renderCategoryView(filter);
+  }
+
+  renderFeaturedVitrine();
 
   if (filtersEl) {
     filtersEl.addEventListener("click", e => {
       const btn = e.target.closest(".filter-btn");
       if (!btn) return;
-      const filter = btn.dataset.filter;
       filtersEl.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-      grid.querySelectorAll(".portfolio-item").forEach(el => {
-        if (filter === "all") el.classList.remove("hidden");
-        else el.classList.toggle("hidden", el.dataset.category !== filter);
-      });
+      applyFilter(btn.dataset.filter);
     });
   }
 }
