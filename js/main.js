@@ -23,7 +23,7 @@ function renderSite() {
   `);
   setText("hero-slogan", c.slogan);
   setHtml("hero-meta", `<span>${c.city}</span><span>Опыт ${c.experience}</span>`);
-  document.getElementById("hero-portrait").src = c.heroPortrait;
+  document.getElementById("hero-portrait").src = imgSrc(c.heroPortrait);
   document.getElementById("hero-portrait").alt = c.photographer;
 
   setText("positioning-title", c.positioning.title);
@@ -42,6 +42,12 @@ function renderSite() {
 
 function setText(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
 function setHtml(id, html) { const el = document.getElementById(id); if (el) el.innerHTML = html; }
+
+function imgSrc(path) {
+  if (!path) return path;
+  const v = typeof ASSET_VERSION !== "undefined" ? ASSET_VERSION : "1";
+  return path + (path.includes("?") ? "&" : "?") + "v=" + v;
+}
 
 function renderDirections() {
   const grid = document.getElementById("directions-grid");
@@ -62,10 +68,12 @@ function renderAiBlock() {
   setText("ai-note", b.note);
   const images = typeof AI_GALLERY !== "undefined" ? AI_GALLERY : b.images.map(img => ({
     image: img.src,
-    alt: img.alt,
+    title: img.alt || "AI-концепт",
+    category: "ai",
+    isCollage: false,
   }));
   document.getElementById("ai-grid").innerHTML = `
-    <div class="ai-block__gallery reveal">${renderAiGalleryMarkup(images)}</div>
+    <div class="ai-block__gallery reveal portfolio-grid portfolio-grid--category">${renderAiGalleryMarkup(images)}</div>
   `;
 }
 
@@ -73,7 +81,7 @@ function renderAbout() {
   const a = SITE_CONTENT.about;
   setText("about-title", a.title);
   setText("about-text", a.text);
-  document.getElementById("about-photo").src = a.photo;
+  document.getElementById("about-photo").src = imgSrc(a.photo);
   document.getElementById("about-highlights").innerHTML = a.highlights.map(h => `<li>${h}</li>`).join("");
 }
 
@@ -132,60 +140,43 @@ function initHeader() {
   nav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => nav.classList.remove("open")));
 }
 
-function renderAiGalleryMarkup(images) {
-  return `<div class="portfolio-ai-grid">${images.map(img => `
-    <div class="portfolio-ai-grid__cell">
-      <img src="${img.image || img.src}" alt="${img.alt}" loading="lazy">
-      <span class="mark-badge">AI-концепт</span>
-    </div>
-  `).join("")}</div>`;
+function renderAiGalleryMarkup(items, { showBadge = true } = {}) {
+  return items.map(item => {
+    const fitClass = item.isCollage ? "portfolio-item__img--collage" : "";
+    const pos = item.objectPosition ? ` style="object-position:${item.objectPosition}"` : "";
+    const badge = showBadge && item.category === "ai"
+      ? '<span class="mark-badge">AI-концепт</span>' : "";
+    return `<article class="portfolio-item${item.isCollage ? " portfolio-item--collage" : ""} reveal" data-id="${item.id}">
+      <img class="portfolio-item__img ${fitClass}" src="${imgSrc(item.image)}" alt="${item.title}" loading="lazy"${pos}>
+      <span class="portfolio-item__title">${item.title}</span>${badge}
+    </article>`;
+  }).join("");
 }
 
-function renderPortfolioItem(item) {
-  if (item.isAi) {
-    return `<article class="portfolio-item portfolio-item--ai reveal" data-category="ai">
-      <div class="portfolio-item__cover">
-        <img class="portfolio-item__img" src="${item.image}" alt="${item.title}" loading="lazy">
-        <span class="portfolio-item__title">${item.title}</span>
-        <span class="mark-badge">AI-концепт</span>
-      </div>
-      <div class="portfolio-item__ai-gallery" aria-hidden="true">
-        ${renderAiGalleryMarkup(AI_GALLERY)}
-      </div>
-    </article>`;
-  }
+function renderPortfolioItem(item, { clickable = false } = {}) {
+  const fitClass = item.isCollage ? "portfolio-item__img--collage" : "";
+  const pos = item.objectPosition ? ` style="object-position:${item.objectPosition}"` : "";
+  const badge = item.category === "ai" ? '<span class="mark-badge">AI-концепт</span>' : "";
+  const clickAttrs = clickable
+    ? ` role="button" tabindex="0" data-filter-target="${item.category}" aria-label="Открыть категорию ${item.title}"`
+    : "";
 
-  return `<article class="portfolio-item reveal" data-category="${item.category}">
-    <img class="portfolio-item__img" src="${item.image}" alt="${item.title}" loading="lazy">
-    <span class="portfolio-item__title">${item.title}</span>
+  return `<article class="portfolio-item portfolio-item--featured reveal" data-category="${item.category}" data-id="${item.id}"${clickAttrs}>
+    <img class="portfolio-item__img ${fitClass}" src="${imgSrc(item.image)}" alt="${item.title}" loading="lazy"${pos}>
+    <span class="portfolio-item__title">${item.title}</span>${badge}
   </article>`;
 }
 
-function bindAiPortfolioItem(aiItem) {
-  if (!aiItem || aiItem.dataset.aiBound === "true") return;
-  aiItem.dataset.aiBound = "true";
-
-  const isCoarse = window.matchMedia("(pointer: coarse)").matches;
-  const close = () => aiItem.classList.remove("is-expanded");
-
-  if (isCoarse) {
-    aiItem.addEventListener("click", e => {
-      e.stopPropagation();
-      aiItem.classList.toggle("is-expanded");
-    });
-    document.addEventListener("click", e => {
-      if (!aiItem.contains(e.target)) close();
-    });
-  }
-
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape") close();
+function setActiveFilterButton(filtersEl, filter) {
+  filtersEl.querySelectorAll(".filter-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.filter === filter);
   });
 }
 
 function initPortfolio() {
   const grid = document.getElementById("portfolio-grid");
   const filtersEl = document.getElementById("portfolio-filters");
+  let currentFilter = "all";
 
   if (filtersEl && typeof PORTFOLIO_FILTERS !== "undefined") {
     filtersEl.innerHTML = PORTFOLIO_FILTERS.map(f =>
@@ -194,26 +185,41 @@ function initPortfolio() {
   }
 
   function renderFeaturedVitrine() {
+    currentFilter = "all";
     grid.className = "portfolio-grid portfolio-grid--featured";
-    grid.innerHTML = PORTFOLIO_FEATURED.map(renderPortfolioItem).join("");
-    bindAiPortfolioItem(grid.querySelector(".portfolio-item--ai"));
+    grid.innerHTML = PORTFOLIO_FEATURED.map(item => renderPortfolioItem(item, { clickable: true })).join("");
+    bindFeaturedInteractions();
   }
 
   function renderCategoryView(category) {
-    if (category === "ai") {
-      grid.className = "portfolio-grid portfolio-grid--ai-gallery";
-      grid.innerHTML = `<div class="portfolio-ai-panel reveal">${renderAiGalleryMarkup(AI_GALLERY)}</div>`;
-      return;
-    }
-
-    const item = PORTFOLIO_FEATURED.find(entry => entry.category === category);
-    grid.className = "portfolio-grid portfolio-grid--single";
-    grid.innerHTML = item ? renderPortfolioItem({ ...item, isAi: false }) : "";
+    currentFilter = category;
+    const items = PORTFOLIO_ITEMS.filter(item => item.category === category);
+    grid.className = "portfolio-grid portfolio-grid--category";
+    grid.innerHTML = renderAiGalleryMarkup(items, { showBadge: category === "ai" });
   }
 
-  function applyFilter(filter) {
+  function applyFilter(filter, { fromFeatured = false } = {}) {
     if (filter === "all") renderFeaturedVitrine();
     else renderCategoryView(filter);
+    if (filtersEl) setActiveFilterButton(filtersEl, filter);
+    if (fromFeatured && filter !== "all") {
+      grid.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }
+
+  function bindFeaturedInteractions() {
+    grid.querySelectorAll("[data-filter-target]").forEach(card => {
+      const category = card.dataset.filterTarget;
+
+      card.addEventListener("click", () => applyFilter(category, { fromFeatured: true }));
+
+      card.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          applyFilter(category, { fromFeatured: true });
+        }
+      });
+    });
   }
 
   renderFeaturedVitrine();
@@ -222,8 +228,6 @@ function initPortfolio() {
     filtersEl.addEventListener("click", e => {
       const btn = e.target.closest(".filter-btn");
       if (!btn) return;
-      filtersEl.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
       applyFilter(btn.dataset.filter);
     });
   }
