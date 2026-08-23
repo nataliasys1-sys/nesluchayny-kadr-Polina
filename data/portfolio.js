@@ -1,4 +1,11 @@
-const ASSET_VERSION = "20250824";
+const ASSET_VERSION = "20250824b";
+
+const AI_IMAGES = {
+  "6.1": "images/6-1-ai-v2.png",
+  "6.2": "images/6-2-ai-v2.png",
+  "6.3": "images/6-3-ai-v2.png",
+  "6.4": "images/6-4-ai-v2.png",
+};
 
 const PORTFOLIO_FILTERS = [
   { id: "all", label: "Все работы" },
@@ -31,10 +38,10 @@ const PORTFOLIO_ITEMS = [
   { id: "5.2", category: "pet", title: "Pet-фото", image: "images/5-2-pet.png", featured: false },
   { id: "5.3", category: "pet", title: "Pet-фото", image: "images/5-3-pet.png", featured: false },
   { id: "5.4", category: "pet", title: "Pet-фото", image: "images/5-4-pet.png", featured: false },
-  { id: "6.1", category: "ai", title: "AI", image: "images/6-1-ai.png", featured: true, objectPosition: "center 20%" },
-  { id: "6.2", category: "ai", title: "AI", image: "images/6-2-ai.png", featured: false, isCollage: true },
-  { id: "6.3", category: "ai", title: "AI", image: "images/6-3-ai.png", featured: false, isCollage: true },
-  { id: "6.4", category: "ai", title: "AI", image: "images/6-4-ai.png", featured: false, isCollage: true },
+  { id: "6.1", category: "ai", title: "AI", image: AI_IMAGES["6.1"], featured: true, objectPosition: "center 20%" },
+  { id: "6.2", category: "ai", title: "AI", image: AI_IMAGES["6.2"], featured: false, isCollage: true },
+  { id: "6.3", category: "ai", title: "AI", image: AI_IMAGES["6.3"], featured: false, isCollage: true },
+  { id: "6.4", category: "ai", title: "AI", image: AI_IMAGES["6.4"], featured: false, isCollage: true },
 ];
 
 const PORTFOLIO_FEATURED = PORTFOLIO_ITEMS.filter(item => item.featured);

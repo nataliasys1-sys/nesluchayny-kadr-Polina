@@ -69,7 +69,7 @@ function renderAiBlock() {
 
   const collage = typeof AI_CONCEPT_BLOCK !== "undefined"
     ? AI_CONCEPT_BLOCK
-    : { image: "images/6-2-ai.png", title: "AI-концепт" };
+    : { image: AI_IMAGES ? AI_IMAGES["6.2"] : "images/6-2-ai-v2.png", title: "AI-концепт" };
 
   document.getElementById("ai-grid").innerHTML = `
     <div class="ai-block__gallery reveal">
