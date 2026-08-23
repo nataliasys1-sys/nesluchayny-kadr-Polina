@@ -38,4 +38,11 @@ const PORTFOLIO_ITEMS = [
 ];
 
 const PORTFOLIO_FEATURED = PORTFOLIO_ITEMS.filter(item => item.featured);
-const AI_GALLERY = PORTFOLIO_ITEMS.filter(item => item.category === "ai");
+
+/** Вкладка AI в меню портфолио: 6.1, 6.2, 6.3, 6.4 */
+const AI_PORTFOLIO_TAB = PORTFOLIO_ITEMS.filter(item => item.category === "ai");
+
+/** Отдельный блок «AI-концепции» на странице: только коллаж 6.2 */
+const AI_CONCEPT_BLOCK = PORTFOLIO_ITEMS.find(item => item.id === "6.2");
+
+const AI_GALLERY = AI_PORTFOLIO_TAB;

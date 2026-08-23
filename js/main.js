@@ -66,14 +66,18 @@ function renderAiBlock() {
   setText("ai-subtitle", b.subtitle);
   setText("ai-text", b.text);
   setText("ai-note", b.note);
-  const images = typeof AI_GALLERY !== "undefined" ? AI_GALLERY : b.images.map(img => ({
-    image: img.src,
-    title: img.alt || "AI-концепт",
-    category: "ai",
-    isCollage: false,
-  }));
+
+  const collage = typeof AI_CONCEPT_BLOCK !== "undefined"
+    ? AI_CONCEPT_BLOCK
+    : { image: "images/6-2-ai.png", title: "AI-концепт" };
+
   document.getElementById("ai-grid").innerHTML = `
-    <div class="ai-block__gallery reveal portfolio-grid portfolio-grid--category">${renderAiGalleryMarkup(images)}</div>
+    <div class="ai-block__gallery reveal">
+      <article class="ai-block__item">
+        <img src="${imgSrc(collage.image)}" alt="${collage.title}" loading="lazy">
+        <span class="mark-badge">AI-концепт</span>
+      </article>
+    </div>
   `;
 }
 
@@ -193,7 +197,9 @@ function initPortfolio() {
 
   function renderCategoryView(category) {
     currentFilter = category;
-    const items = PORTFOLIO_ITEMS.filter(item => item.category === category);
+    const items = category === "ai" && typeof AI_PORTFOLIO_TAB !== "undefined"
+      ? AI_PORTFOLIO_TAB
+      : PORTFOLIO_ITEMS.filter(item => item.category === category);
     grid.className = "portfolio-grid portfolio-grid--category";
     grid.innerHTML = renderAiGalleryMarkup(items, { showBadge: category === "ai" });
   }
