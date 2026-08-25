@@ -14,8 +14,8 @@
   --font-brand: "Cormorant Garamond", Georgia, serif;
   --font-body: "Jost", "Segoe UI", sans-serif;
   --header-height: 72px;
-  --container: min(1120px, 92vw);
-  --container-wide: min(1220px, 94vw);
+  --container: min(1120px, calc(100vw - 3rem));
+  --container-wide: min(1220px, calc(100vw - 2.5rem));
   --section-pad: 5rem;
   --section-pad-sm: 4.1rem;
   --radius: 4px;

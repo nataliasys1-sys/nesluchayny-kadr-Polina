@@ -43,7 +43,7 @@
   align-items: center;
   column-gap: clamp(2.5rem, 6vw, 5rem);
   row-gap: 2rem;
-  padding: calc(var(--header-height) + 6rem) 4vw 6rem;
+  padding: calc(var(--header-height) + 6rem) 4vw 5rem;
   position: relative;
   overflow: hidden;
 }
@@ -118,9 +118,24 @@
   border: 1px solid var(--color-accent); opacity: 0.35;
 }
 
-.positioning { text-align: center; }
-.positioning .section-text { margin: 0 auto; }
-.positioning .section-title { max-width: none; margin-left: auto; margin-right: auto; }
+.positioning {
+  text-align: center;
+  padding-top: var(--section-pad-sm);
+}
+.positioning .container {
+  max-width: min(680px, var(--container));
+}
+.positioning .section-text {
+  margin: 0 auto;
+  max-width: 100%;
+  text-wrap: pretty;
+}
+.positioning .section-title {
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+  text-wrap: balance;
+}
 
 .portfolio { padding-bottom: 4.5rem; }
 .portfolio .section-title { max-width: none; margin-bottom: 0.85rem; }
@@ -265,12 +280,25 @@
 .posing {
   background: var(--color-bg-alt);
 }
-.posing-inner { max-width: 720px; margin: 0 auto; text-align: center; }
-.posing .section-title { max-width: none; margin-left: auto; margin-right: auto; }
-.posing .section-text { margin-bottom: 0.5rem; }
+.posing-inner {
+  max-width: min(720px, 100%);
+  margin-inline: auto;
+  text-align: center;
+}
+.posing .section-title {
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+  text-wrap: balance;
+}
+.posing .section-text {
+  margin: 0 auto 0.5rem;
+  max-width: 620px;
+  text-wrap: pretty;
+}
 .posing-quote {
-  display: inline-block;
-  max-width: 34rem;
+  display: block;
+  max-width: 32rem;
   margin: 1.75rem auto 0;
   padding: 1.1rem 1.25rem 0;
   font-family: var(--font-display);
@@ -324,16 +352,16 @@
   background: linear-gradient(180deg, var(--color-bg) 0%, #faf7f3 45%, var(--color-bg) 100%);
   border-top: 1px solid var(--color-border);
 }
-.packages__head { text-align: center; margin-bottom: 2.5rem; }
-.packages__head .section-title { max-width: none; margin-left: auto; margin-right: auto; }
+.packages__head { text-align: left; margin-bottom: 2.5rem; }
+.packages__head .section-title { max-width: none; margin-left: 0; margin-right: 0; }
 .packages-subtitle {
   max-width: 34rem;
-  margin: 0.75rem auto 0;
-  text-align: center;
+  margin: 0.75rem 0 0;
+  text-align: left;
   font-size: var(--text-base);
   line-height: 1.75;
   color: var(--color-text-muted);
-  text-wrap: balance;
+  text-wrap: pretty;
 }
 .packages-grid {
   display: grid;
@@ -482,9 +510,6 @@
 }
 .package-card__price {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  color: var(--color-text);
 }
 .package-card__price-label {
   font-family: var(--font-body);
@@ -497,6 +522,11 @@
 }
 .package-card__price-value {
   display: block;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-text);
   white-space: nowrap;
   word-break: keep-all;
   hyphens: none;
@@ -531,7 +561,7 @@
   background: var(--color-bg-soft);
   padding: var(--section-pad) 0 var(--section-pad-sm);
 }
-.faq-list { max-width: 720px; margin: 0 auto; }
+.faq-list { max-width: 720px; margin: 0; }
 .faq .section-title { max-width: none; margin-bottom: 1.75rem; }
 .faq-item { border-bottom: 1px solid var(--color-border); }
 .faq-question {
@@ -555,6 +585,14 @@
   appearance: none;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.32s ease, opacity 0.32s ease;
+}
+.faq-question:visited {
+  color: var(--color-text);
+  -webkit-text-fill-color: var(--color-text);
+}
+.faq-item.open .faq-question:visited {
+  color: var(--color-accent);
+  -webkit-text-fill-color: var(--color-accent);
 }
 .faq-question:hover {
   color: var(--color-accent);
@@ -634,6 +672,15 @@
   background: var(--color-bg);
   padding-bottom: calc(var(--section-pad) + env(safe-area-inset-bottom, 0px));
 }
+.contact-section > .container > .section-title {
+  max-width: none;
+  text-wrap: balance;
+}
+@media (min-width: 768px) {
+  .contact-section > .container > .section-title {
+    white-space: nowrap;
+  }
+}
 .form-wrapper { max-width: 520px; margin: 0 auto; }
 .form-hint {
   text-align: center;
@@ -684,6 +731,41 @@
   background-repeat: no-repeat;
   background-position: right 1rem center;
   padding-right: 2.5rem;
+  color: var(--color-text);
+  -webkit-text-fill-color: var(--color-text);
+}
+.form-field select.is-placeholder {
+  color: var(--color-text-muted);
+  -webkit-text-fill-color: var(--color-text-muted);
+}
+.form-field select.is-placeholder:focus {
+  color: var(--color-text-muted);
+  -webkit-text-fill-color: var(--color-text-muted);
+}
+.form-field select option {
+  color: var(--color-text);
+  background: #fff;
+}
+.form-field select option[value=""] {
+  color: var(--color-text-muted);
+}
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.88;
+  -webkit-text-fill-color: var(--color-text-muted);
+}
+.form-field select:active {
+  color: var(--color-text);
+  -webkit-text-fill-color: var(--color-text);
+}
+.form-field select.is-placeholder:active {
+  color: var(--color-text-muted);
+  -webkit-text-fill-color: var(--color-text-muted);
+}
+.form-field select:not(.is-placeholder):focus {
+  color: var(--color-text);
+  -webkit-text-fill-color: var(--color-text);
 }
 .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
   outline: none;
@@ -833,7 +915,7 @@
   .directions-grid, .benefits-grid, .packages-grid { grid-template-columns: 1fr; }
   .package-card__spec { grid-template-columns: 1fr; gap: 0.2rem; }
   .package-card__tagline { min-height: auto; }
-  .packages-subtitle { max-width: 28rem; padding: 0 0.5rem; }
+  .packages-subtitle { max-width: 28rem; padding: 0; }
   .portfolio-grid--featured,
   .portfolio-grid--category { grid-template-columns: 1fr; }
   .portfolio-filters {

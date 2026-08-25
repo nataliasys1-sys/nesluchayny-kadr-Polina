@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initFaq();
   initForm();
   initContactMethod();
+  initFormDirectionSelect();
   initFormDirectionPrefill();
   initReveal();
   initScrollSpy();
@@ -194,6 +195,20 @@ function renderFormOptions() {
   const sel = document.getElementById("form-direction");
   sel.innerHTML = '<option value="">Выберите направление</option>' +
     SITE_CONTENT.directions.map(d => `<option value="${d.id}">${d.title}</option>`).join("");
+  updateDirectionSelectState();
+}
+
+function updateDirectionSelectState() {
+  const sel = document.getElementById("form-direction");
+  if (!sel) return;
+  sel.classList.toggle("is-placeholder", !sel.value);
+}
+
+function initFormDirectionSelect() {
+  const sel = document.getElementById("form-direction");
+  if (!sel) return;
+  sel.addEventListener("change", updateDirectionSelectState);
+  updateDirectionSelectState();
 }
 
 function prefillFormDirection(id) {
@@ -201,6 +216,7 @@ function prefillFormDirection(id) {
   if (!sel || !id) return;
   const exists = SITE_CONTENT.directions.some(d => d.id === id);
   if (exists) sel.value = id;
+  updateDirectionSelectState();
 }
 
 function initContactMethod() {
