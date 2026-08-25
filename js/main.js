@@ -3,9 +3,14 @@ document.addEventListener("DOMContentLoaded", () => {
   initHeader();
   initPortfolio();
   initReviews();
+  initPackages();
+  initDirectionLinks();
   initFaq();
   initForm();
+  initContactMethod();
+  initFormDirectionPrefill();
   initReveal();
+  initScrollSpy();
   initParallax();
   initCustomCursor();
 });
@@ -38,6 +43,11 @@ function renderSite() {
   renderCta();
   renderFooter();
   renderFormOptions();
+  toggleReviewsSection();
+}
+
+function isPlaceholder(value) {
+  return !value || /^\[.+\]$/.test(String(value).trim());
 }
 
 function setText(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
@@ -49,10 +59,19 @@ function imgSrc(path) {
   return path + (path.includes("?") ? "&" : "?") + "v=" + v;
 }
 
+function portfolioImgMarkup(item, { lazy = true } = {}) {
+  const fitClass = item.isCollage ? "portfolio-item__img--collage" : "";
+  const pos = item.objectPosition ? ` style="object-position:${item.objectPosition}"` : "";
+  const loading = lazy ? ' loading="lazy"' : "";
+  const src = imgSrc(item.image);
+  const fallback = item.image;
+  return `<img class="portfolio-item__img ${fitClass}" src="${src}" data-fallback="${fallback}" alt="${item.title}" decoding="async"${loading}${pos} onerror="if(this.dataset.fallback&&this.src.indexOf(this.dataset.fallback)===-1){this.onerror=null;this.src=this.dataset.fallback}">`;
+}
+
 function renderDirections() {
   const grid = document.getElementById("directions-grid");
   grid.innerHTML = SITE_CONTENT.directions.map((d, i) => `
-    <article class="direction-card reveal">
+    <article class="direction-card reveal" data-direction-id="${d.id}" tabindex="0" role="link" aria-label="Смотреть работы: ${d.title}">
       <div class="direction-card__num">0${i + 1}</div>
       <h3 class="direction-card__title">${d.title}</h3>
       <p class="direction-card__text">${d.description}</p>
@@ -74,7 +93,7 @@ function renderAiBlock() {
   document.getElementById("ai-grid").innerHTML = `
     <div class="ai-block__gallery reveal">
       <article class="ai-block__item">
-        <img src="${imgSrc(collage.image)}" alt="${collage.title}" loading="lazy">
+        <img src="${imgSrc(collage.image)}" data-fallback="${collage.image}" alt="${collage.title}" loading="lazy" decoding="async" onerror="if(this.dataset.fallback&&this.src.indexOf(this.dataset.fallback)===-1){this.onerror=null;this.src=this.dataset.fallback}">
         <span class="mark-badge">AI-концепт</span>
       </article>
     </div>
@@ -85,7 +104,10 @@ function renderAbout() {
   const a = SITE_CONTENT.about;
   setText("about-title", a.title);
   setText("about-text", a.text);
-  document.getElementById("about-photo").src = imgSrc(a.photo);
+  const photo = document.getElementById("about-photo");
+  photo.src = imgSrc(a.photo);
+  photo.loading = "lazy";
+  photo.decoding = "async";
   document.getElementById("about-highlights").innerHTML = a.highlights.map(h => `<li>${h}</li>`).join("");
 }
 
@@ -97,8 +119,9 @@ function renderPosing() {
 }
 
 function renderBenefits() {
-  document.getElementById("benefits-grid").innerHTML = SITE_CONTENT.benefits.map(b => `
+  document.getElementById("benefits-grid").innerHTML = SITE_CONTENT.benefits.map((b, i) => `
     <div class="benefit-item reveal">
+      <span class="benefit-item__num" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span>
       <h3 class="benefit-item__title">${b.title}</h3>
       <p class="benefit-item__text">${b.text}</p>
     </div>
@@ -108,8 +131,8 @@ function renderBenefits() {
 function renderFaq() {
   document.getElementById("faq-list").innerHTML = SITE_CONTENT.faq.map((f, i) => `
     <div class="faq-item" data-faq="${i}">
-      <button class="faq-question" type="button">${f.question}</button>
-      <div class="faq-answer">${f.answer}</div>
+      <button class="faq-question" type="button" aria-expanded="false">${f.question}</button>
+      <div class="faq-answer"><div class="faq-answer__inner">${f.answer}</div></div>
     </div>
   `).join("");
 }
@@ -119,20 +142,109 @@ function renderCta() {
   setText("cta-text", SITE_CONTENT.cta.text);
 }
 
+function setContactLink(el, value, { type }) {
+  if (!el) return;
+  if (isPlaceholder(value)) {
+    el.textContent = value;
+    el.removeAttribute("href");
+    el.classList.add("footer__link--placeholder");
+    return;
+  }
+  el.classList.remove("footer__link--placeholder");
+  if (type === "telegram") {
+    const href = value.startsWith("http") ? value : `https://t.me/${value.replace(/^@/, "")}`;
+    el.href = href;
+    el.textContent = SITE_CONTENT.contacts.telegramLabel || value;
+  } else if (type === "phone") {
+    el.href = `tel:${value.replace(/\s/g, "")}`;
+    el.textContent = value;
+  } else if (type === "email") {
+    el.href = `mailto:${value}`;
+    el.textContent = value;
+  }
+}
+
 function renderFooter() {
   const ct = SITE_CONTENT.contacts;
   setText("footer-brand", SITE_CONTENT.photographer);
-  setText("footer-telegram", ct.telegram);
-  setText("footer-phone", ct.phone);
-  setText("footer-email", ct.email);
+  setContactLink(document.getElementById("footer-telegram"), ct.telegram, { type: "telegram" });
+  setContactLink(document.getElementById("footer-phone"), ct.phone, { type: "phone" });
+  setContactLink(document.getElementById("footer-email"), ct.email, { type: "email" });
   setText("footer-copy", "© " + new Date().getFullYear() + " " + SITE_CONTENT.photographer);
 }
 
 function renderFormOptions() {
-  setText("form-note", SITE_CONTENT.form.demoNote);
+  const note = document.getElementById("form-note");
+  const hint = document.getElementById("form-hint");
+  const endpoint = SITE_CONTENT.form?.endpoint?.trim();
+  if (note) {
+    if (!endpoint) {
+      note.innerHTML = `
+        <span class="form-note__line">${SITE_CONTENT.form.noEndpointLine1}</span>
+        <span class="form-note__line">${SITE_CONTENT.form.noEndpointLine2}</span>`;
+      note.hidden = false;
+    } else {
+      note.hidden = true;
+    }
+  }
+  if (hint && SITE_CONTENT.form.formHint) {
+    hint.textContent = SITE_CONTENT.form.formHint;
+  }
+
   const sel = document.getElementById("form-direction");
   sel.innerHTML = '<option value="">Выберите направление</option>' +
     SITE_CONTENT.directions.map(d => `<option value="${d.id}">${d.title}</option>`).join("");
+}
+
+function prefillFormDirection(id) {
+  const sel = document.getElementById("form-direction");
+  if (!sel || !id) return;
+  const exists = SITE_CONTENT.directions.some(d => d.id === id);
+  if (exists) sel.value = id;
+}
+
+function initContactMethod() {
+  const form = document.getElementById("contact-form");
+  const contactInput = document.getElementById("contact");
+  if (!form || !contactInput) return;
+
+  const placeholders = {
+    default: "Выберите способ связи",
+    telegram: "@username",
+    phone: "+7 999 000-00-00",
+  };
+
+  function updatePlaceholder() {
+    const method = form.querySelector('input[name="contact-method"]:checked');
+    contactInput.placeholder = method ? placeholders[method.value] : placeholders.default;
+  }
+
+  form.querySelectorAll('input[name="contact-method"]').forEach(radio => {
+    radio.addEventListener("change", updatePlaceholder);
+  });
+  updatePlaceholder();
+}
+
+function initFormDirectionPrefill() {
+  document.querySelectorAll('a[href="#contact"]').forEach(link => {
+    link.addEventListener("click", () => {
+      const activeFilter = document.querySelector(".filter-btn.active")?.dataset.filter;
+      if (activeFilter && activeFilter !== "all") {
+        prefillFormDirection(activeFilter);
+      }
+    });
+  });
+}
+
+function toggleReviewsSection() {
+  const section = document.getElementById("reviews");
+  const navLink = document.querySelector('.nav a[href="#reviews"]');
+  const show = SITE_CONTENT.reviews?.show === true &&
+    typeof REVIEWS !== "undefined" &&
+    REVIEWS.some(r => !r.demo);
+
+  if (section) section.hidden = !show;
+  if (navLink) navLink.hidden = !show;
 }
 
 function initHeader() {
@@ -140,33 +252,31 @@ function initHeader() {
   const burger = document.getElementById("burger");
   const nav = document.getElementById("nav");
   window.addEventListener("scroll", () => header.classList.toggle("scrolled", window.scrollY > 40));
-  burger.addEventListener("click", () => nav.classList.toggle("open"));
-  nav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => nav.classList.remove("open")));
+  burger.addEventListener("click", () => {
+    const open = nav.classList.toggle("open");
+    burger.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  nav.querySelectorAll("a:not([hidden])").forEach(a => a.addEventListener("click", () => {
+    nav.classList.remove("open");
+    burger.setAttribute("aria-expanded", "false");
+  }));
 }
 
-function renderAiGalleryMarkup(items, { showBadge = true } = {}) {
+function renderAiGalleryMarkup(items) {
   return items.map(item => {
-    const fitClass = item.isCollage ? "portfolio-item__img--collage" : "";
-    const pos = item.objectPosition ? ` style="object-position:${item.objectPosition}"` : "";
-    const badge = showBadge && item.category === "ai"
+    const badge = item.category === "ai"
       ? '<span class="mark-badge">AI-концепт</span>' : "";
-    return `<article class="portfolio-item${item.isCollage ? " portfolio-item--collage" : ""} reveal" data-id="${item.id}">
-      <img class="portfolio-item__img ${fitClass}" src="${imgSrc(item.image)}" alt="${item.title}" loading="lazy"${pos}>
+    return `<article class="portfolio-item${item.isCollage ? " portfolio-item--collage" : ""} portfolio-item--lightbox reveal" data-id="${item.id}" role="button" tabindex="0" aria-label="Открыть фото ${item.title}">
+      ${portfolioImgMarkup(item)}
       <span class="portfolio-item__title">${item.title}</span>${badge}
     </article>`;
   }).join("");
 }
 
-function renderPortfolioItem(item, { clickable = false } = {}) {
-  const fitClass = item.isCollage ? "portfolio-item__img--collage" : "";
-  const pos = item.objectPosition ? ` style="object-position:${item.objectPosition}"` : "";
+function renderPortfolioItem(item) {
   const badge = item.category === "ai" ? '<span class="mark-badge">AI-концепт</span>' : "";
-  const clickAttrs = clickable
-    ? ` role="button" tabindex="0" data-filter-target="${item.category}" aria-label="Открыть категорию ${item.title}"`
-    : "";
-
-  return `<article class="portfolio-item portfolio-item--featured reveal" data-category="${item.category}" data-id="${item.id}"${clickAttrs}>
-    <img class="portfolio-item__img ${fitClass}" src="${imgSrc(item.image)}" alt="${item.title}" loading="lazy"${pos}>
+  return `<article class="portfolio-item portfolio-item--featured portfolio-item--lightbox reveal" data-category="${item.category}" data-id="${item.id}" role="button" tabindex="0" aria-label="Открыть фото ${item.title}">
+    ${portfolioImgMarkup(item)}
     <span class="portfolio-item__title">${item.title}</span>${badge}
   </article>`;
 }
@@ -174,6 +284,27 @@ function renderPortfolioItem(item, { clickable = false } = {}) {
 function setActiveFilterButton(filtersEl, filter) {
   filtersEl.querySelectorAll(".filter-btn").forEach(b => {
     b.classList.toggle("active", b.dataset.filter === filter);
+  });
+}
+
+function bindPortfolioLightbox(items) {
+  const grid = document.getElementById("portfolio-grid");
+  grid.querySelectorAll(".portfolio-item[data-id]").forEach(node => {
+    const idx = items.findIndex(i => i.id === node.dataset.id);
+    if (idx < 0) return;
+
+    const open = e => {
+      if (e) e.preventDefault();
+      if (typeof Lightbox !== "undefined") Lightbox.open(items, idx, node);
+    };
+
+    node.onclick = open;
+    node.onkeydown = e => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        open(e);
+      }
+    };
   });
 }
 
@@ -191,8 +322,9 @@ function initPortfolio() {
   function renderFeaturedVitrine() {
     currentFilter = "all";
     grid.className = "portfolio-grid portfolio-grid--featured";
-    grid.innerHTML = PORTFOLIO_FEATURED.map(item => renderPortfolioItem(item, { clickable: true })).join("");
-    bindFeaturedInteractions();
+    grid.innerHTML = PORTFOLIO_FEATURED.map(item => renderPortfolioItem(item)).join("");
+    bindPortfolioLightbox(PORTFOLIO_FEATURED);
+    applyStagger(grid, ".portfolio-item");
   }
 
   function renderCategoryView(category) {
@@ -201,42 +333,15 @@ function initPortfolio() {
       ? AI_PORTFOLIO_TAB
       : PORTFOLIO_ITEMS.filter(item => item.category === category);
     grid.className = "portfolio-grid portfolio-grid--category";
-    grid.innerHTML = renderAiGalleryMarkup(items, { showBadge: category === "ai" });
+    grid.innerHTML = renderAiGalleryMarkup(items);
+    bindPortfolioLightbox(items);
+    applyStagger(grid, ".portfolio-item");
   }
 
-  function applyFilter(filter, { fromFeatured = false } = {}) {
+  function applyFilter(filter) {
     if (filter === "all") renderFeaturedVitrine();
     else renderCategoryView(filter);
     if (filtersEl) setActiveFilterButton(filtersEl, filter);
-    if (fromFeatured && filter !== "all") {
-      grid.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-  }
-
-  function bindFeaturedInteractions() {
-    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    let hoverTimer = null;
-
-    grid.querySelectorAll("[data-filter-target]").forEach(card => {
-      const category = card.dataset.filterTarget;
-
-      card.addEventListener("click", () => applyFilter(category, { fromFeatured: true }));
-
-      card.addEventListener("keydown", e => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          applyFilter(category, { fromFeatured: true });
-        }
-      });
-
-      if (canHover) {
-        card.addEventListener("mouseenter", () => {
-          clearTimeout(hoverTimer);
-          hoverTimer = setTimeout(() => applyFilter(category), 320);
-        });
-        card.addEventListener("mouseleave", () => clearTimeout(hoverTimer));
-      }
-    });
   }
 
   renderFeaturedVitrine();
@@ -251,80 +356,272 @@ function initPortfolio() {
 }
 
 function initReviews() {
-  const track = document.getElementById("reviews-track");
-  let current = 0;
+  if (SITE_CONTENT.reviews?.show !== true) return;
+  if (typeof REVIEWS === "undefined" || !REVIEWS.some(r => !r.demo)) return;
 
-  track.innerHTML = REVIEWS.map(r => `
+  const track = document.getElementById("reviews-track");
+  if (!track) return;
+
+  let current = 0;
+  track.innerHTML = REVIEWS.filter(r => !r.demo).map(r => `
     <div class="review-slide">
       <p class="review-slide__text">«${r.text}»</p>
       <p class="review-slide__author">${r.name}</p>
       <p class="review-slide__direction">${r.direction}</p>
-      ${r.demo ? '<span class="demo-badge">Демонстрационный отзыв</span>' : ""}
     </div>
   `).join("");
 
+  const slides = REVIEWS.filter(r => !r.demo);
+
   function goTo(i) {
-    current = (i + REVIEWS.length) % REVIEWS.length;
+    current = (i + slides.length) % slides.length;
     track.style.transform = `translateX(-${current * 100}%)`;
   }
 
   document.getElementById("review-prev").addEventListener("click", () => goTo(current - 1));
   document.getElementById("review-next").addEventListener("click", () => goTo(current + 1));
 
+  const carousel = track.closest(".reviews-carousel");
   let autoplay = setInterval(() => goTo(current + 1), 6000);
-  track.closest(".reviews-carousel").addEventListener("mouseenter", () => clearInterval(autoplay));
+  carousel.addEventListener("mouseenter", () => clearInterval(autoplay));
+}
+
+function renderPackageGift(gift) {
+  if (!gift) return "";
+  const title = typeof gift === "object" ? gift.title : gift;
+  const subtitle = typeof gift === "object" ? gift.subtitle : "";
+  return `
+    <div class="package-card__gift">
+      <span class="package-card__gift-icon" aria-hidden="true">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 1.5 12.1 7.9 18.5 10 12.1 12.1 10 18.5 7.9 12.1 1.5 10 7.9 7.9 10 1.5Z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <div class="package-card__gift-text">
+        <p class="package-card__gift-title">${title}</p>
+        ${subtitle ? `<p class="package-card__gift-sub">${subtitle}</p>` : ""}
+      </div>
+    </div>`;
+}
+
+function initPackages() {
+  const section = document.getElementById("packages");
+  const grid = document.getElementById("packages-grid");
+  if (!section || !grid || !SITE_CONTENT.packages) return;
+
+  const p = SITE_CONTENT.packages;
+  setText("packages-title", p.title);
+  setText("packages-subtitle", p.subtitle);
+
+  const spec = (label, value) => `
+    <div class="package-card__spec">
+      <dt>${label}</dt>
+      <dd>${value}</dd>
+    </div>`;
+
+  grid.innerHTML = p.items.map(pkg => {
+    const featured = pkg.id === "classic";
+    const cardClass = [
+      "package-card", "reveal",
+      `package-card--${pkg.id}`,
+      featured ? "package-card--featured" : "",
+    ].filter(Boolean).join(" ");
+
+    return `
+    <article class="${cardClass}" data-package-id="${pkg.id}">
+      <div class="package-card__head">
+        <div class="package-card__badge-slot">
+          ${pkg.badge ? `<span class="package-card__badge">${pkg.badge}</span>` : ""}
+        </div>
+        <h3 class="package-card__name">${pkg.name}</h3>
+        <p class="package-card__tagline">${pkg.tagline}</p>
+      </div>
+      <div class="package-card__body">
+        <dl class="package-card__specs">
+          ${spec("Продолжительность", pkg.duration)}
+          ${spec("Готовые фото", pkg.photos)}
+          ${spec("Обработка", pkg.processing)}
+          ${pkg.extras ? spec("Дополнительно", pkg.extras) : ""}
+          ${spec("Бронирование", pkg.booking)}
+        </dl>
+        ${renderPackageGift(pkg.gift)}
+      </div>
+      <div class="package-card__foot">
+        <p class="package-card__price"><span class="package-card__price-label">Стоимость</span> <span class="package-card__price-value">${pkg.price}</span></p>
+        <button type="button" class="btn btn--package package-card__cta" data-form-message="${pkg.formMessage}">${pkg.cta} <span class="btn-arrow">→</span></button>
+      </div>
+    </article>`;
+  }).join("");
+
+  grid.querySelectorAll(".package-card__cta").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const message = document.getElementById("message");
+      if (message) message.value = btn.dataset.formMessage;
+      document.getElementById("contact").scrollIntoView({ behavior: "smooth", block: "start" });
+      setTimeout(() => message?.focus(), 400);
+    });
+  });
+  applyStagger(grid, ".package-card");
+}
+
+function initDirectionLinks() {
+  const grid = document.getElementById("directions-grid");
+  if (!grid) return;
+
+  function openDirection(id) {
+    const filterBtn = document.querySelector(`.filter-btn[data-filter="${id}"]`);
+    if (filterBtn) filterBtn.click();
+    document.getElementById("portfolio")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  grid.addEventListener("click", e => {
+    const card = e.target.closest("[data-direction-id]");
+    if (!card) return;
+    openDirection(card.dataset.directionId);
+  });
+
+  grid.addEventListener("keydown", e => {
+    const card = e.target.closest("[data-direction-id]");
+    if (!card || (e.key !== "Enter" && e.key !== " ")) return;
+    e.preventDefault();
+    openDirection(card.dataset.directionId);
+  });
+}
+
+function applyStagger(container, selector, step = 0.07) {
+  if (!container) return;
+  container.querySelectorAll(selector).forEach((el, i) => {
+    el.style.transitionDelay = `${Math.min(i * step, 0.42)}s`;
+  });
+}
+
+function initScrollSpy() {
+  const links = [...document.querySelectorAll('.nav a[href^="#"]:not([hidden])')];
+  const sections = links
+    .map(a => document.querySelector(a.getAttribute("href")))
+    .filter(Boolean);
+  if (!sections.length) return;
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const id = entry.target.id;
+      links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === `#${id}`));
+    });
+  }, { rootMargin: "-35% 0px -55% 0px", threshold: 0.05 });
+
+  sections.forEach(section => observer.observe(section));
 }
 
 function initFaq() {
   document.getElementById("faq-list").addEventListener("click", e => {
     const btn = e.target.closest(".faq-question");
     if (!btn) return;
-    btn.parentElement.classList.toggle("open");
+    const item = btn.parentElement;
+    const open = !item.classList.contains("open");
+    item.classList.toggle("open", open);
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
   });
+}
+
+function setFormState(form, state) {
+  const submit = document.getElementById("form-submit");
+  const success = document.getElementById("form-success");
+  const error = document.getElementById("form-error");
+
+  if (success) success.hidden = state !== "success";
+  if (error) error.hidden = state !== "error";
+
+  if (submit) {
+    submit.disabled = state === "submitting";
+    submit.setAttribute("aria-busy", state === "submitting" ? "true" : "false");
+    const defaultLabel = submit.dataset.defaultLabel || "Отправить";
+    submit.innerHTML = state === "submitting"
+      ? `${SITE_CONTENT.form.submittingLabel} <span class="btn-arrow">→</span>`
+      : `${defaultLabel} <span class="btn-arrow">→</span>`;
+  }
+
+  form.dataset.state = state || "idle";
 }
 
 function initForm() {
   const form = document.getElementById("contact-form");
-  form.addEventListener("submit", e => {
+  const submit = document.getElementById("form-submit");
+  if (submit) submit.dataset.defaultLabel = "Отправить";
+
+  form.addEventListener("submit", async e => {
     e.preventDefault();
+    if (form.dataset.state === "submitting") return;
+
     let valid = true;
     form.querySelectorAll("[data-required]").forEach(field => {
       const wrap = field.closest(".form-field");
       const err = wrap.querySelector(".form-error");
-      if (!field.value.trim()) {
+      const empty = field.type === "checkbox" ? !field.checked : !String(field.value).trim();
+      if (empty) {
         wrap.classList.add("error");
-        err.textContent = "Обязательное поле";
+        if (err) err.textContent = field.type === "checkbox"
+          ? "Необходимо согласие на обработку данных"
+          : "Обязательное поле";
         valid = false;
       } else {
         wrap.classList.remove("error");
-        err.textContent = "";
+        if (err) err.textContent = "";
       }
     });
 
     const method = form.querySelector('input[name="contact-method"]:checked');
+    const methodErr = document.getElementById("method-error");
     if (!method) {
-      document.getElementById("method-error").textContent = "Выберите способ связи";
+      if (methodErr) methodErr.textContent = "Выберите способ связи";
       valid = false;
-    } else {
-      document.getElementById("method-error").textContent = "";
+    } else if (methodErr) {
+      methodErr.textContent = "";
     }
 
     if (!valid) return;
 
-    const data = {
+    const endpoint = SITE_CONTENT.form?.endpoint?.trim();
+    if (!endpoint) {
+      const note = document.getElementById("form-note");
+      if (note) {
+        note.hidden = false;
+        note.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+      return;
+    }
+
+    const payload = {
       name: form.name.value.trim(),
       contactMethod: method.value,
       contact: form.contact.value.trim(),
       direction: form.direction.value,
       message: form.message.value.trim(),
+      consent: form.consent.checked,
     };
-    console.log("Форма (демо):", data);
 
-    form.reset();
-    const success = document.getElementById("form-success");
-    success.textContent = SITE_CONTENT.form.successMessage;
-    success.hidden = false;
-    setTimeout(() => { success.hidden = true; }, 8000);
+    setFormState(form, "submitting");
+    const errorEl = document.getElementById("form-error");
+    if (errorEl) errorEl.textContent = "";
+
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error("request failed");
+
+      form.reset();
+      setFormState(form, "success");
+      const success = document.getElementById("form-success");
+      if (success) success.textContent = SITE_CONTENT.form.successMessage;
+      setTimeout(() => setFormState(form, "idle"), 8000);
+    } catch {
+      setFormState(form, "error");
+      if (errorEl) errorEl.textContent = SITE_CONTENT.form.errorMessage;
+    }
   });
 }
 

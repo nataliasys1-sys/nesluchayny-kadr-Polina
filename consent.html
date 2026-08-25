@@ -18,7 +18,8 @@
   <main class="legal-page">
     <div class="container">
       <h1>Согласие на обработку персональных данных</h1>
-      <p>Отправляя форму на сайте, вы даёте согласие Полине Бунтовской на обработку ваших персональных данных в соответствии с Федеральным законом № 152-ФЗ «О персональных данных».</p>
+      <p class="legal-disclaimer">Текст носит информационный характер и не является юридическим заключением. Перед публикацией рекомендуется согласовать документ с юристом.</p>
+      <p>Отправляя форму на сайте, Вы даёте согласие <span id="legal-operator-name">[ФИО ОПЕРАТОРА]</span> на обработку Ваших персональных данных в соответствии с Федеральным законом № 152-ФЗ «О персональных данных».</p>
       <h2>Обрабатываемые данные</h2>
       <ul>
         <li>Имя</li>
@@ -29,12 +30,24 @@
       <h2>Цели обработки</h2>
       <p>Обработка заявок, связь с клиентом, организация фотосессий.</p>
       <h2>Срок действия согласия</h2>
-      <p>Согласие действует до момента его отзыва. Отозвать согласие можно, направив запрос на [E-MAIL].</p>
+      <p>Согласие действует до момента его отзыва. Отозвать согласие можно, направив запрос на <span id="legal-email">[E-MAIL]</span>.</p>
       <h2>Права субъекта данных</h2>
       <p>Вы имеете право на доступ, исправление, удаление данных и отзыв согласия в любой момент.</p>
       <p style="margin-top:2rem"><a href="index.html" class="btn">← На главную</a></p>
     </div>
   </main>
+  <script src="data/content.js?v=20250824f"></script>
+  <script>
+    (function () {
+      const legal = typeof SITE_CONTENT !== "undefined" ? SITE_CONTENT.legal : null;
+      const contacts = typeof SITE_CONTENT !== "undefined" ? SITE_CONTENT.contacts : null;
+      const email = legal?.contactEmail && !/^\[.+\]$/.test(legal.contactEmail)
+        ? legal.contactEmail
+        : (contacts?.email && !/^\[.+\]$/.test(contacts.email) ? contacts.email : "[E-MAIL]");
+      const name = legal?.operatorName || "[ФИО ОПЕРАТОРА]";
+      document.getElementById("legal-operator-name").textContent = name;
+      document.getElementById("legal-email").textContent = email;
+    })();
+  </script>
 </body>
 </html>
-

@@ -1,5 +1,7 @@
 :root {
-  --color-bg: #f5f0ea;
+  --color-bg: #f7f3ed;
+  --color-bg-alt: #faf8f5;
+  --color-bg-soft: #f3efe8;
   --color-bg-dark: #141210;
   --color-bg-card: #faf7f3;
   --color-text: #1e1a17;
@@ -15,7 +17,12 @@
   --container: min(1120px, 92vw);
   --container-wide: min(1220px, 94vw);
   --section-pad: 5rem;
+  --section-pad-sm: 4.1rem;
   --radius: 4px;
   --shadow: 0 20px 60px rgba(20, 18, 16, 0.08);
   --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.3s ease;
+  --text-sm: 0.9rem;
+  --text-base: 1.0625rem;
+  --text-md: 1.125rem;
 }

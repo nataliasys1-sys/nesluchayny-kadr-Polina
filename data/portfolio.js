@@ -1,4 +1,4 @@
-const ASSET_VERSION = "20250824c";
+const ASSET_VERSION = "20250825a";
 
 const AI_IMAGES = {
   "6.1": "images/6-1-ai-v2.png",

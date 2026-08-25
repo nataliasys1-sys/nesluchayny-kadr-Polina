@@ -18,23 +18,41 @@
   <main class="legal-page">
     <div class="container">
       <h1>Политика конфиденциальности</h1>
-      <p>Настоящая политика описывает порядок обработки персональных данных на сайте фотографа Полины Бунтовской.</p>
-      <h2>1. Какие данные собираются</h2>
+      <p class="legal-disclaimer">Текст носит информационный характер и не является юридическим заключением. Перед публикацией рекомендуется согласовать документ с юристом.</p>
+      <p>Настоящая политика описывает порядок обработки персональных данных на сайте фотографа <span id="legal-operator">Полины Бунтовской</span>.</p>
+      <h2>1. Оператор персональных данных</h2>
+      <p id="legal-operator-block">Оператор: <span id="legal-operator-name">[ФИО ОПЕРАТОРА]</span></p>
+      <h2>2. Какие данные собираются</h2>
       <p>При заполнении формы обратной связи могут собираться: имя, способ и данные для связи (Telegram или телефон), выбранное направление съёмки, текст сообщения.</p>
-      <h2>2. Цели обработки</h2>
+      <h2>3. Цели обработки</h2>
       <ul>
         <li>Обработка заявок на фотосессии</li>
         <li>Обратная связь с клиентами</li>
         <li>Улучшение качества сервиса</li>
       </ul>
-      <h2>3. Хранение данных</h2>
+      <h2>4. Хранение данных</h2>
       <p>Данные хранятся только в течение времени, необходимого для достижения целей обработки, и удаляются по запросу пользователя.</p>
-      <h2>4. Передача третьим лицам</h2>
+      <h2>5. Передача третьим лицам</h2>
       <p>Персональные данные не передаются третьим лицам без согласия пользователя, за исключением случаев, предусмотренных законодательством РФ.</p>
-      <h2>5. Контакты</h2>
-      <p>По вопросам обработки данных: [E-MAIL]</p>
+      <h2>6. Контакты</h2>
+      <p>По вопросам обработки данных: <span id="legal-email">[E-MAIL]</span></p>
       <p style="margin-top:2rem"><a href="index.html" class="btn">← На главную</a></p>
     </div>
   </main>
+  <script src="data/content.js?v=20250824f"></script>
+  <script>
+    (function () {
+      const legal = typeof SITE_CONTENT !== "undefined" ? SITE_CONTENT.legal : null;
+      const contacts = typeof SITE_CONTENT !== "undefined" ? SITE_CONTENT.contacts : null;
+      const email = legal?.contactEmail && !/^\[.+\]$/.test(legal.contactEmail)
+        ? legal.contactEmail
+        : (contacts?.email && !/^\[.+\]$/.test(contacts.email) ? contacts.email : "[E-MAIL]");
+      const name = legal?.operatorName || "[ФИО ОПЕРАТОРА]";
+      const elName = document.getElementById("legal-operator-name");
+      const elEmail = document.getElementById("legal-email");
+      if (elName) elName.textContent = name;
+      if (elEmail) elEmail.textContent = email;
+    })();
+  </script>
 </body>
 </html>

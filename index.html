@@ -9,9 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/sections.css?v=20250824e">
-  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/base.css?v=20250825e">
+  <link rel="stylesheet" href="css/sections.css?v=20250825e">
+  <link rel="stylesheet" href="css/lightbox.css?v=20250825a">
+  <link rel="stylesheet" href="css/animations.css?v=20250825e">
   <link rel="stylesheet" href="css/cursor.css">
 </head>
 <body>
@@ -22,12 +23,13 @@
       <nav class="nav" id="nav">
         <a href="#portfolio">Портфолио</a>
         <a href="#directions">Направления</a>
+        <a href="#packages">Форматы</a>
         <a href="#about">Обо мне</a>
-        <a href="#reviews">Отзывы</a>
+        <a href="#reviews" hidden>Отзывы</a>
         <a href="#faq">FAQ</a>
         <a href="#contact">Контакты</a>
       </nav>
-      <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+      <button class="burger" id="burger" type="button" aria-label="Меню" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </header>
 
@@ -35,7 +37,7 @@
     <section class="hero" id="hero">
       <div class="hero__content">
         <div class="hero__composition">
-                    <h1 class="hero__project" id="hero-project">
+          <h1 class="hero__project" id="hero-project">
             <span class="hero__title-line hero__title-ne">НЕ</span>
             <span class="hero__title-line hero__title-word">случайный</span>
             <span class="hero__title-line hero__title-word">кадр</span>
@@ -48,7 +50,7 @@
       <div class="hero__portrait">
         <div class="hero__portrait-deco"></div>
         <div class="hero__portrait-wrap">
-          <img id="hero-portrait" src="images/hero.jpg" alt="Полина Бунтовская">
+          <img id="hero-portrait" src="images/hero.jpg" alt="Полина Бунтовская" decoding="async">
         </div>
       </div>
     </section>
@@ -72,9 +74,34 @@
 
     <section class="directions" id="directions">
       <div class="container">
-        <p class="section-label reveal">Услуги</p>
+        <p class="section-label reveal">Направления</p>
         <h2 class="section-title reveal">Направления съёмок</h2>
         <div class="directions-grid" id="directions-grid"></div>
+      </div>
+    </section>
+
+    <section class="packages" id="packages">
+      <div class="container">
+        <div class="packages__head reveal">
+          <p class="section-label">Форматы</p>
+          <h2 class="section-title" id="packages-title">Форматы съёмки</h2>
+          <p class="packages-subtitle" id="packages-subtitle"></p>
+        </div>
+        <div class="packages-grid" id="packages-grid"></div>
+      </div>
+    </section>
+
+    <section class="about" id="about">
+      <div class="container about-grid">
+        <div class="about-photo reveal">
+          <img id="about-photo" src="images/about.png" alt="Полина Бунтовская" loading="lazy" decoding="async">
+        </div>
+        <div class="reveal">
+          <p class="section-label">Знакомство</p>
+          <h2 class="section-title" id="about-title"></h2>
+          <p class="section-text" id="about-text"></p>
+          <ul class="about-highlights" id="about-highlights"></ul>
+        </div>
       </div>
     </section>
 
@@ -86,20 +113,6 @@
         <p class="section-text reveal" id="ai-text" style="margin-top:1rem"></p>
         <div class="ai-block__grid" id="ai-grid"></div>
         <p class="demo-badge reveal" id="ai-note" style="margin-top:2rem"></p>
-      </div>
-    </section>
-
-    <section class="about" id="about">
-      <div class="container about-grid">
-        <div class="about-photo reveal">
-          <img id="about-photo" src="images/about.png" alt="Полина Бунтовская">
-        </div>
-        <div class="reveal">
-          <p class="section-label">Знакомство</p>
-          <h2 class="section-title" id="about-title"></h2>
-          <p class="section-text" id="about-text"></p>
-          <ul class="about-highlights" id="about-highlights"></ul>
-        </div>
       </div>
     </section>
 
@@ -120,15 +133,15 @@
       </div>
     </section>
 
-    <section class="reviews" id="reviews">
+    <section class="reviews" id="reviews" hidden>
       <div class="container">
         <p class="section-label reveal">Отзывы</p>
         <h2 class="section-title reveal">Что говорят клиенты</h2>
         <div class="reviews-carousel reveal">
           <div class="reviews-track" id="reviews-track"></div>
           <div class="reviews-nav">
-            <button id="review-prev" aria-label="Предыдущий">←</button>
-            <button id="review-next" aria-label="Следующий">→</button>
+            <button type="button" id="review-prev" aria-label="Предыдущий отзыв">←</button>
+            <button type="button" id="review-next" aria-label="Следующий отзыв">→</button>
           </div>
         </div>
       </div>
@@ -146,7 +159,7 @@
       <div class="container reveal">
         <h2 class="section-title" id="cta-title"></h2>
         <p class="section-text" id="cta-text"></p>
-        <a href="#contact" class="btn">Написать мне <span class="btn-arrow">→</span></a>
+        <a href="#contact" class="btn btn--cta">Написать мне <span class="btn-arrow">→</span></a>
       </div>
     </section>
 
@@ -155,24 +168,31 @@
         <p class="section-label reveal">Связь</p>
         <h2 class="section-title reveal">Записаться на съёмку</h2>
         <div class="form-wrapper reveal">
+          <p class="form-hint" id="form-hint"></p>
           <p class="form-note" id="form-note"></p>
           <form id="contact-form" novalidate>
             <div class="form-field">
               <label for="name">Имя *</label>
-              <input type="text" id="name" name="name" data-required>
+              <input type="text" id="name" name="name" data-required autocomplete="name">
               <span class="form-error"></span>
             </div>
             <div class="form-field">
               <label>Способ связи *</label>
               <div class="radio-group">
-                <label><input type="radio" name="contact-method" value="telegram"> Telegram</label>
-                <label><input type="radio" name="contact-method" value="phone"> Телефон</label>
+                <label class="radio-option">
+                  <input type="radio" name="contact-method" value="telegram">
+                  <span class="radio-option__text">Telegram</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="contact-method" value="phone">
+                  <span class="radio-option__text">Телефон</span>
+                </label>
               </div>
               <span class="form-error" id="method-error"></span>
             </div>
             <div class="form-field">
               <label for="contact">Контакт *</label>
-              <input type="text" id="contact" name="contact" data-required placeholder="@username или +7...">
+              <input type="text" id="contact" name="contact" data-required placeholder="Выберите способ связи" autocomplete="tel">
               <span class="form-error"></span>
             </div>
             <div class="form-field">
@@ -182,10 +202,18 @@
             </div>
             <div class="form-field">
               <label for="message">Сообщение</label>
-              <textarea id="message" name="message" rows="4" placeholder="Расскажите о вашей идее..."></textarea>
+              <textarea id="message" name="message" rows="4" placeholder="Расскажите о Вашей идее..."></textarea>
             </div>
-            <button type="submit" class="btn">Отправить <span class="btn-arrow">→</span></button>
-            <div class="form-success" id="form-success" hidden></div>
+            <div class="form-field form-field--consent">
+              <label class="consent-label">
+                <input type="checkbox" id="consent" name="consent" data-required>
+                <span class="consent-text">Я даю <a href="consent.html" target="_blank" rel="noopener">согласие на обработку персональных данных</a> и принимаю условия <a href="privacy.html" target="_blank" rel="noopener">Политики конфиденциальности</a>.</span>
+              </label>
+              <span class="form-error"></span>
+            </div>
+            <button type="submit" class="btn btn--submit" id="form-submit">Отправить <span class="btn-arrow">→</span></button>
+            <div class="form-success" id="form-success" role="status" hidden></div>
+            <div class="form-error form-error--global" id="form-error" role="alert" hidden></div>
           </form>
         </div>
       </div>
@@ -216,9 +244,10 @@
     </div>
   </footer>
 
-  <script src="data/content.js?v=20250824"></script>
-  <script src="data/portfolio.js?v=20250824c"></script>
+  <script src="data/content.js?v=20250825f"></script>
+  <script src="data/portfolio.js?v=20250825a"></script>
   <script src="data/reviews.js?v=20250824"></script>
-  <script src="js/main.js?v=20250824c"></script>
+  <script src="js/lightbox.js?v=20250825a"></script>
+  <script src="js/main.js?v=20250825e"></script>
 </body>
 </html>
